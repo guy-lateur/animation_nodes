@@ -8,7 +8,9 @@ listChains = [
     ["mn_EdgeIndicesSocket", "mn_EdgeIndicesListSocket"],
     ["mn_PolygonIndicesSocket", "mn_PolygonIndicesListSocket"],
     ["mn_ParticleSocket", "mn_ParticleListSocket"],
-    ["mn_ParticleSystemSocket", "mn_ParticleSystemListSocket"]]
+    ["mn_ParticleSystemSocket", "mn_ParticleSystemListSocket"],
+    ["mn_SplineSocket", "mn_SplineListSocket"],
+    ["mn_BezierPointSocket", "mn_BezierPointListSocket"]]
     
 def getBaseSocketType(socketType):
     for listChain in listChains:
@@ -34,6 +36,11 @@ def hasListSocketType(socketType):
 def getSocketNameByDataType(dataType):
     for subClass in getSocketClasses():
         if getattr(subClass, "dataType") == dataType: return subClass.bl_idname
+    return None
+    
+def getSocketClassFromIdName(idName):
+    for cls in getSocketClasses():
+        if cls.bl_idname == idName: return cls
     return None
     
 def getListDataTypes():

@@ -29,30 +29,45 @@ class mn_BaseSocket(NodeSocket):
     
     def draw(self, context, layout, node, text):
         displayText = self.customName if self.displayCustomName else text
+        
+        row = layout.row(align = True)
         if self.editableCustomName:
-            row = layout.row(align = True)
             row.prop(self, "customName", text = "")
-            if self.removeable:
-                removeSocket = row.operator("mn.remove_socket", text = "", icon = "X")
-                removeSocket.nodeTreeName = node.id_data.name
-                removeSocket.nodeName = node.name
-                removeSocket.isOutputSocket = self.is_output
-                removeSocket.socketIdentifier = self.identifier
         else:
-            row = layout.row()
             if not self.is_output and not isSocketLinked(self):
                 self.drawInput(row, node, displayText)
             else:
                 row.label(displayText)
-            if self.removeable:
-                removeSocket = row.operator("mn.remove_socket", text = "", icon = "X")
-                removeSocket.nodeTreeName = node.id_data.name
-                removeSocket.nodeName = node.name
-                removeSocket.isOutputSocket = self.is_output
-                removeSocket.socketIdentifier = self.identifier
+                
+        if self.moveable:
+            row.separator()
+            moveSockets = [
+                row.operator("mn.move_socket", text = "", icon = "TRIA_UP"),
+                row.operator("mn.move_socket", text = "", icon = "TRIA_DOWN")]
+            for i, socket in enumerate(moveSockets):
+                socket.nodeTreeName = node.id_data.name
+                socket.nodeName = node.name
+                socket.isOutputSocket = self.is_output
+                socket.socketIdentifier = self.identifier
+                socket.moveUp = i == 0
+                
+        if self.removeable:
+            row.separator()
+            removeSocket = row.operator("mn.remove_socket", text = "", icon = "X")
+            removeSocket.nodeTreeName = node.id_data.name
+            removeSocket.nodeName = node.name
+            removeSocket.isOutputSocket = self.is_output
+            removeSocket.socketIdentifier = self.identifier
             
     def draw_color(self, context, node):
         return self.drawColor
+        
+    def copySettingsFrom(self, node):
+        self.setStoreableValue(node.getStoreableValue())
+        attributes = [prop.identifier for prop in self.bl_rna.properties if not prop.is_readonly]
+        for attribute in attributes:
+            get = getattr(node, attribute, None)
+            setattr(self, attribute, get)
         
         
 def customNameChanged(self, context):
@@ -110,16 +125,18 @@ class mn_SocketProperties:
     callNodeToRemove = BoolProperty(default = False)
     callNodeWhenCustomNameChanged = BoolProperty(default = False)
     loopAsList = BoolProperty(default = False)
-    
+    moveable = BoolProperty(default = False)
+    moveGroup = IntProperty(default = 0)
+       
         
 class RemoveSocketOperator(bpy.types.Operator):
     bl_idname = "mn.remove_socket"
     bl_label = "Remove Socket"
     
-    nodeTreeName = bpy.props.StringProperty()
-    nodeName = bpy.props.StringProperty()
-    isOutputSocket = bpy.props.BoolProperty()
-    socketIdentifier = bpy.props.StringProperty()
+    nodeTreeName = StringProperty()
+    nodeName = StringProperty()
+    isOutputSocket = BoolProperty()
+    socketIdentifier = StringProperty()
     
     def execute(self, context):
         node = getNode(self.nodeTreeName, self.nodeName)
@@ -130,3 +147,34 @@ class RemoveSocketOperator(bpy.types.Operator):
             if self.isOutputSocket: node.outputs.remove(socket)
             else: node.inputs.remove(socket)
         return {'FINISHED'}
+
+class MoveSocketOperator(bpy.types.Operator):
+    bl_idname = "mn.move_socket"
+    bl_label = "Move Socket"
+    
+    nodeTreeName = StringProperty()
+    nodeName = StringProperty()
+    isOutputSocket = BoolProperty()
+    socketIdentifier = StringProperty()
+    moveUp = BoolProperty()
+    
+    def execute(self, context):
+        node = getNode(self.nodeTreeName, self.nodeName)
+        moveSocket = getSocketByIdentifier(node, self.isOutputSocket, self.socketIdentifier)
+        sockets = node.outputs if self.isOutputSocket else node.inputs
+        moveableSocketIndices = [index for index, socket in enumerate(sockets) if socket.moveable and socket.moveGroup == moveSocket.moveGroup]
+        currentIndex = list(sockets).index(moveSocket)
+        
+        targetIndex = -1
+        for index in moveableSocketIndices:
+            if self.moveUp and index < currentIndex:
+                targetIndex = index
+            if not self.moveUp and index > currentIndex:
+                targetIndex = index
+                break
+                
+        if targetIndex != -1:
+            sockets.move(currentIndex, targetIndex)
+            if self.moveUp: sockets.move(targetIndex + 1, currentIndex)
+            else: sockets.move(targetIndex - 1, currentIndex)
+        return {'FINISHED'}        
