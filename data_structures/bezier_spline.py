@@ -60,17 +60,17 @@ class BezierSpline(Spline):
             segment.calculateSmoothHandles(strength)
             
     def getNeighborSegments(self):
-        points = self.points
-        if len(points) < 2: return []
+        bezierPoints = self.bezierPoints
+        if len(bezierPoints) < 2: return []
         neighborSegments = []
         if self.isCyclic:
-            for i, point in enumerate(points):
-                segment = BezierNeighbors(points[i-2].location, points[i-1], point.location)
+            for i, point in enumerate(bezierPoints):
+                segment = BezierNeighbors(bezierPoints[i-2].location, bezierPoints[i-1], point.location)
                 neighborSegments.append(segment)
         else:
-            neighborSegments.append(BezierNeighbors(points[0].location, points[0], points[1].location))
-            neighborSegments.append(BezierNeighbors(points[-2].location, points[-1], points[-1].location))
-            for before, point, after in zip(points[:-2], points[1:-1], points[2:]):
+            neighborSegments.append(BezierNeighbors(bezierPoints[0].location, bezierPoints[0], bezierPoints[1].location))
+            neighborSegments.append(BezierNeighbors(bezierPoints[-2].location, bezierPoints[-1], bezierPoints[-1].location))
+            for before, point, after in zip(bezierPoints[:-2], bezierPoints[1:-1], bezierPoints[2:]):
                 neighborSegments.append(BezierNeighbors(before.location, point, after.location))
         return neighborSegments
         
