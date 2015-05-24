@@ -3,17 +3,18 @@ from spline import Spline
 
 
 class PolySpline(Spline):
-    def __init__(self, curve, isCyclic = False):
-        Spline.__init__(self, curve, isCyclic)
+    def __init__(self, isCyclic = False):
+        Spline.__init__(self, isCyclic)
         
         self.points = []
         
     @staticmethod
-    def fromBlenderSpline(curve, blenderSpline):
-        spline = PolySpline(curve, blenderSpline.use_cyclic_u)
+    def fromBlenderSpline(blenderCurve, blenderSpline):
+        spline = PolySpline(blenderSpline.use_cyclic_u)
         
         # TODO: add points
         
+        spline.transform(blenderCurve.matrix_world)
         return spline
         
     @property
