@@ -116,13 +116,13 @@ class BezierSpline(Spline):
         if not self.isCyclic:
             startPoint = self.evaluate(0)
             startTangent = self.evaluateTangent(0)
-            startLineProjection = findNearestPointOnLine(startPoint, startTangent, point)
+            startLineProjection = curve_util.findNearestPointOnLine(startPoint, startTangent, point)
             if (startLineProjection.x - startPoint.x) / startTangent.x <= 0:
                 possibleProjectionData.append((startLineProjection, startTangent))
             
             endPoint = self.evaluate(1)
             endTangent = self.evaluateTangent(1)
-            endLineProjection = findNearestPointOnLine(endPoint, endTangent, point)
+            endLineProjection = curve_util.findNearestPointOnLine(endPoint, endTangent, point)
             if (endLineProjection.x - endPoint.x) / endTangent.x >= 0: 
                 possibleProjectionData.append((endLineProjection, endTangent))
         
