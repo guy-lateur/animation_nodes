@@ -2,6 +2,7 @@ from mathutils import Vector
 
 from . import spline
 from spline import Spline
+from . import curve_util
 
 
 class PolySpline(Spline):
