@@ -46,6 +46,7 @@ class Spline:
         raise NotImplementedError("'project' function not implemented")
         
     # returns point & tangent
+    # could probably be implemented here -- needs project, evaluate & evaluateTangent
     def projectExtended(self, point):
         raise NotImplementedError("'projectExtended' function not implemented")
     

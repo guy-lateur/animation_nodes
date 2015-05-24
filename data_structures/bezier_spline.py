@@ -86,9 +86,8 @@ class BezierSpline(Spline):
         return True
         
     def copy(self):
-        spline = BezierSpline()
+        spline = BezierSpline(self.isCyclic)
         spline.bezierPoints = [bezierPoint.copy() for bezierPoint in self.bezierPoints]
-        spline.isCyclic = self.isCyclic
         return spline
         
     def transform(self, matrix):
@@ -107,6 +106,7 @@ class BezierSpline(Spline):
         parameters = [(i + segment.project(point)) / len(self.segments) for i, segment in enumerate(self.segments)]
         return curve_util.chooseNearestParameter(self, point, parameters)
         
+    # could probably be implemented in base spline class -- needs project, evaluate & evaluateTangent
     def projectExtended(self, point):
         parameter = self.project(point)
         splineProjection = self.evaluate(parameter)

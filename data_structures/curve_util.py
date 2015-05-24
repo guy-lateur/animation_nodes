@@ -12,10 +12,16 @@ def chooseNearestParameter(curveElement, point, parameters):
     sampledData = [(parameter, (point - curveElement.evaluate(parameter)).length_squared) for parameter in parameters]
     return min(sampledData, key = lambda item: item[1])[0]   
 
+def findNearestParameterOnLine(linePosition, lineDirection, point):
+    directionLength = lineDirection.length
+    lineDirection = lineDirection.normalized()
+    parameter = (lineDirection.dot(point - linePosition)) / directionLength
+    return parameter
+
 def findNearestPointOnLine(linePosition, lineDirection, point):
     lineDirection = lineDirection.normalized()
     dotProduct = lineDirection.dot(point - linePosition)
-    return linePosition + (lineDirection * dotProduct)
+    return linePosition + (lineDirection * dotProduct)    
     
 defaultDeltaImaginary = 0.00001
 def complexToRealFloat(complex, deltaImaginary = defaultDeltaImaginary):
