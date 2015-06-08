@@ -254,12 +254,22 @@ class MathMenu2DCoordinates(bpy.types.Menu):
         insertNode(layout, "mn_Math2DCoordinatesPolarToCartesian", "Polar To Cartesian")                                              
         insertNode(layout, "mn_Math2DCoordinatesPolarToCartesianList", "Polar To Cartesian List")                                              
                                   
+class MathMenu1D(bpy.types.Menu):
+    bl_idname = "mn.math_menu_1d"
+    bl_label = "Math Menu 1D"
+    
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "mn_Math1DFunctionEvaluatorNode", "1D Function Evaluator")                                              
+        insertNode(layout, "mn_Math1DFunctionSamplerNode", "1D Function Sampler")                                              
+        
 class MathMenu2D(bpy.types.Menu):
     bl_idname = "mn.math_menu_2d"
     bl_label = "Math Menu 2D"
     
     def draw(self, context):
         layout = self.layout
+        insertNode(layout, "mn_Math2DFunctionEvaluatorNode", "2D Function Evaluator")                                              
         insertNode(layout, "mn_Math2DFunctionSamplerNode", "2D Function Sampler")                                              
         layout.menu("mn.math_menu_2d_coordinates", text = "Coordinates")
         
@@ -285,6 +295,8 @@ class MathMenu3D(bpy.types.Menu):
     
     def draw(self, context):
         layout = self.layout
+        insertNode(layout, "mn_Math3DFunctionEvaluatorNode", "3D Function Evaluator")                                              
+        insertNode(layout, "mn_Math3DFunctionSamplerNode", "3D Function Sampler")                                              
         layout.menu("mn.math_menu_3d_coordinates", text = "Coordinates")
                                   
 class MathMenu(bpy.types.Menu):
@@ -296,6 +308,7 @@ class MathMenu(bpy.types.Menu):
         insertNode(layout, "mn_MathNumberOperatorNode", "Number Operator")                                              
         insertNode(layout, "mn_MathUniformSamplerNode", "Uniform Sampler")                                              
         layout.separator()
+        layout.menu("mn.math_menu_1d", text = "1D")
         layout.menu("mn.math_menu_2d", text = "2D")
         layout.menu("mn.math_menu_3d", text = "3D")
                                   
